@@ -3,19 +3,15 @@ package hopfield;
 import java.util.Random;
 
 public class Network {
-	private int cols;
-	private int rows;
 	private int [][] pobudzenie;
 	private Random random;
 
 	public Network(int cols, int rows) {
-		this.cols = cols;
-		this.rows = rows;
+		pobudzenie = new int [cols * rows][cols * rows];
 		random = new Random();
 	}
 
 	public void learn(boolean stability, int [] data) {
-		pobudzenie = new int [cols * rows][cols * rows];
 		for(int i = 0; i < data.length; i++) {
 			for(int j = 0; j < data.length; j++) {
 				if(i == j && stability) continue;

@@ -26,7 +26,7 @@ import javax.swing.Timer;
 import Diagnostics.Debugger;
 
 enum Letter {
-	N, W, M
+	N, W, M, END_OF_LETTERS
 }
 
 public class App extends JFrame {
@@ -41,7 +41,7 @@ public class App extends JFrame {
 	private JCheckBox stabilityBox;
 	private JRadioButton syncUpdateButton;
 	private JRadioButton asyncUpdateButton;
-	private Network network = new Network(COLS, ROWS);
+	private Network network;
 	private PaintPanel paintPanel = new PaintPanel(COLS, ROWS);
 	private PaintPanel outputPanel = new PaintPanel(COLS, ROWS);
 
@@ -134,7 +134,8 @@ public class App extends JFrame {
 	}
 	
 	protected void learn(boolean stabilityOn) {
-		for(int i = 0; i <= Letter.N.ordinal(); i++) {
+		network = new Network(COLS, ROWS);
+		for(int i = 0; i < Letter.END_OF_LETTERS.ordinal(); i++) {
 			int [] data; 
 			data = loadImage(Letter.values()[i]);
 			network.learn(stabilityOn, data);
