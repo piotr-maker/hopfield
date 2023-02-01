@@ -20,6 +20,7 @@ public class PaintPanel extends JPanel implements MouseListener, MouseMotionList
 	private int previousPenX = -1;
 	private int previousPenY = -1;
 	private BufferedImage image;
+	private boolean paintable = true;
 
 	private int width = 400;
 	private int height = 400;
@@ -112,6 +113,14 @@ public class PaintPanel extends JPanel implements MouseListener, MouseMotionList
 		}
 		repaint();
 	}
+	
+	public void disablePaint() {
+		this.paintable = false;
+	}
+	
+	public void enablePaint() {
+		this.paintable = true;
+	}
 
 	@Override
 	public Dimension getPreferredSize() {
@@ -126,7 +135,7 @@ public class PaintPanel extends JPanel implements MouseListener, MouseMotionList
 
 	@Override
 	public void mouseDragged(MouseEvent event) {
-		if(previousPenX != -1 && previousPenY != -1) {
+		if(previousPenX != -1 && previousPenY != -1 && paintable) {
 			Graphics2D g2 = (Graphics2D) image.getGraphics();
 			g2.setStroke(new BasicStroke(12));
 			g2.setColor(color);

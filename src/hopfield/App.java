@@ -51,6 +51,7 @@ public class App extends JFrame {
 		setBounds((dimensions.width - width)/2, (dimensions.height-height)/2, width, height);
 		setLayout(new FlowLayout(FlowLayout.LEADING, MARGIN, MARGIN));
 		setResizable(false);
+		outputPanel.disablePaint();
 		
 		for(int i = 0; i <= Letter.N.ordinal(); i++) {
 			int [] data; 
