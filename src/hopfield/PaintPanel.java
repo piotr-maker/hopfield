@@ -22,12 +22,17 @@ public class PaintPanel extends JPanel implements MouseListener, MouseMotionList
 	private BufferedImage image;
 	private boolean paintable = true;
 
+	private int horizontalSection;
+	private int verticalSection;
+
 	private int width = 400;
 	private int height = 400;
 
-	public PaintPanel() {
+	public PaintPanel(int cols, int rows) {
 		this.addMouseMotionListener(this);
 		this.addMouseListener(this);
+		horizontalSection = width / cols;
+		verticalSection = height /rows;
 		image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		clear();
 	}
@@ -53,8 +58,8 @@ public class PaintPanel extends JPanel implements MouseListener, MouseMotionList
 		int [] data = new int[width * height];
 
 		int index = 0;
-		for(int x = 0; x < scaledImage.getWidth(); x++) {
-			for(int y = 0; y < scaledImage.getHeight(); y++) {
+		for(int y = 0; y < scaledImage.getHeight(); y++) {
+			for(int x = 0; x < scaledImage.getWidth(); x++) {
 				Color color = new Color(scaledImage.getRGB(x, y));
 				data[index] = color.getRed() < 220 ? 1 : 0;
 				index++;
@@ -67,9 +72,9 @@ public class PaintPanel extends JPanel implements MouseListener, MouseMotionList
 		int horizontalSections = (int)image.getWidth() / cols;
 		int verticalSections = (int)image.getHeight() / rows;
 
-		for(int x = 0; x < cols; x++) {
-			for(int y = 0; y < rows; y++) {
-				if(data[x * cols + y] != 1)
+		for(int y = 0; y < rows; y++) {
+			for(int x = 0; x < cols; x++) {
+				if(data[y * rows + x] != 1)
 					continue;
 				for (int i = 0; i < horizontalSections; i++) {
 					for (int j = 0; j < verticalSections; j++ ) {
@@ -105,19 +110,24 @@ public class PaintPanel extends JPanel implements MouseListener, MouseMotionList
 
 	public void clear() {
 		previousPenX = -1;
-		previousPenY = -1;
+		previousPenY = -1; 
 		for(int i = 0; i < width; i++) {
 			for(int j = 0; j < height; j++) {
-				image.setRGB(i, j, bgColor.getRGB());
+				if((i % horizontalSection == 0 && i != 0) 
+						|| j % verticalSection == 0 && j != 0) {
+					image.setRGB(i, j, color.getRGB());
+				} else {
+					image.setRGB(i, j, bgColor.getRGB());
+				}
 			}
 		}
 		repaint();
 	}
-	
+
 	public void disablePaint() {
 		this.paintable = false;
 	}
-	
+
 	public void enablePaint() {
 		this.paintable = true;
 	}
@@ -135,7 +145,7 @@ public class PaintPanel extends JPanel implements MouseListener, MouseMotionList
 
 	@Override
 	public void mouseDragged(MouseEvent event) {
-		if(previousPenX != -1 && previousPenY != -1 && paintable) {
+		/*if(previousPenX != -1 && previousPenY != -1 && paintable) {
 			Graphics2D g2 = (Graphics2D) image.getGraphics();
 			g2.setStroke(new BasicStroke(12));
 			g2.setColor(color);
@@ -144,7 +154,7 @@ public class PaintPanel extends JPanel implements MouseListener, MouseMotionList
 		}
 
 		previousPenX = event.getX();
-		previousPenY = event.getY();
+		previousPenY = event.getY();*/
 	}
 
 	@Override
@@ -154,7 +164,22 @@ public class PaintPanel extends JPanel implements MouseListener, MouseMotionList
 
 	@Override
 	public void mouseClicked(MouseEvent event) {
-
+		int xOffset = event.getX() / 50 * 50;
+		int yOffset = event.getY() / 50 * 50;
+		if(paintable) {
+			for(int x = 0; x < horizontalSection; x++) {
+				for(int y = 0; y < verticalSection; y++) {
+					if(event.getButton() == MouseEvent.BUTTON3) {
+						if(x != 0 && y != 0) {
+							image.setRGB(x + xOffset, y + yOffset, bgColor.getRGB());
+						}
+					} else if(event.getButton() == MouseEvent.BUTTON1) {
+						image.setRGB(x + xOffset, y + yOffset, color.getRGB());	
+					}
+				}
+			}
+			repaint();
+		}
 	}
 
 	@Override

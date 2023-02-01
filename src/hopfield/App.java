@@ -42,8 +42,8 @@ public class App extends JFrame {
 	private JRadioButton syncUpdateButton;
 	private JRadioButton asyncUpdateButton;
 	private Network network = new Network(COLS, ROWS);
-	private PaintPanel paintPanel = new PaintPanel();
-	private PaintPanel outputPanel = new PaintPanel();
+	private PaintPanel paintPanel = new PaintPanel(COLS, ROWS);
+	private PaintPanel outputPanel = new PaintPanel(COLS, ROWS);
 
 	public App(String title) {
 		super(title);
