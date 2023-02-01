@@ -7,6 +7,8 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,6 +16,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -23,7 +26,7 @@ import javax.swing.Timer;
 import Diagnostics.Debugger;
 
 enum Letter {
-	W, M, N
+	N, W, M
 }
 
 public class App extends JFrame {
@@ -35,6 +38,7 @@ public class App extends JFrame {
 	
 
 	private Timer timer;
+	private JCheckBox stabilityBox;
 	private JRadioButton syncUpdateButton;
 	private JRadioButton asyncUpdateButton;
 	private Network network = new Network(COLS, ROWS);
@@ -52,13 +56,16 @@ public class App extends JFrame {
 		setLayout(new FlowLayout(FlowLayout.LEADING, MARGIN, MARGIN));
 		setResizable(false);
 		outputPanel.disablePaint();
+		stabilityBox = new JCheckBox("Stabilizacja");
+		stabilityBox.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				learn(e.getStateChange() == 1);
+			}
+		});
 		
-		for(int i = 0; i <= Letter.N.ordinal(); i++) {
-			int [] data; 
-			data = loadImage(Letter.values()[i]);
-			network.learn(data);
-		}
-		
+		learn(false);
 		timer = new Timer(20,new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -110,10 +117,11 @@ public class App extends JFrame {
 		asyncUpdateButton.setSelected(false);
 		lettersButtonGroup.add(syncUpdateButton);
 		lettersButtonGroup.add(asyncUpdateButton);
-
+		
 		int rows = Math.round((float)(paintPanel.getPreferredSize().height) / (float)((playButton.getPreferredSize().height + 5)));
 		GridLayout panelLayout = new GridLayout(rows, 1, 0, 5);
 		JPanel menuPanel = new JPanel(panelLayout);
+		menuPanel.add(stabilityBox);
 		menuPanel.add(syncUpdateButton);
 		menuPanel.add(asyncUpdateButton);
 		menuPanel.add(playButton);
@@ -123,6 +131,14 @@ public class App extends JFrame {
 		add(paintPanel);
 		add(outputPanel);
 		setVisible(true);
+	}
+	
+	protected void learn(boolean stabilityOn) {
+		for(int i = 0; i <= Letter.N.ordinal(); i++) {
+			int [] data; 
+			data = loadImage(Letter.values()[i]);
+			network.learn(stabilityOn, data);
+		}
 	}
 	
 	protected int [] loadImage(Letter letter) {
